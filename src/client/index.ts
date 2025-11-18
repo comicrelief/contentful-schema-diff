@@ -84,8 +84,13 @@ export default class SimpleCMAClient {
       }
 
       if (resp.status == 429) {
+        // It seems that Contentful often doesn't return the X-Contentful-RateLimit-Reset header previous used here, 
+        // meaning this would fall over. This new header seems to be stable, but is ultimately just returning a integer 
+        // value that's being piped into the await to stop the code falling over. 
+        // We could just as easily hardcode the value I guess, but wanted it to be based on some reality,
+        // and to unblock our deploy pipeline as quickly as possible. 🤷
         const reset = resp.headers.get('x-contentful-ratelimit-second-limit');
-        if (!reset) { throw new Error(`Rate-limited with no X-Contentful-RateLimit-Reset header!`) }
+        if (!reset) { throw new Error(`No x-contentful-ratelimit-second-limit header set`) }
 
         await wait(parseFloat(reset) * 1000)
         continue

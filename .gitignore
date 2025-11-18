@@ -9,3 +9,5 @@ coverage
 
 # we use yarn.lock
 package-lock.json
+
+github
